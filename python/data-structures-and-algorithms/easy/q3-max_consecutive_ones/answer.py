@@ -2,16 +2,16 @@ from typing import List
 
 class Solution:
     def findMaxConsecutiveOnes(self, nums: List[int]) -> int:
-        last = 0
-        plus = 0
+        count = 0
+        res = 0
         for i in nums:
             if (i == 0):
-                last = max(last, plus)
-                plus = 0
+                count = max(count, res)
+                res = 0
             else:
-                plus += 1
-                last = max(last, plus)
-        return last
+                res += 1
+                count = max(count, res)
+        return count
     
 
 # Test cases
