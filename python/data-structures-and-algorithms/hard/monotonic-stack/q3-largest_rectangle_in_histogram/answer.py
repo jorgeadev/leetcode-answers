@@ -2,12 +2,12 @@ from typing import List
 
 class Solution:
     def largestRectangleArea(self, heights: List[int]) -> int:
-        for i in range(len(heights)):
-            heights[i] = (heights[i], i)
-        heights.append((0, len(heights)))  # Sentinel to pop all remaining bars
+        # Do not modify input list in-place; use a new list for (height, index) tuples
+        h_with_idx = [(h, i) for i, h in enumerate(heights)]
+        h_with_idx.append((0, len(heights)))  # Sentinel to pop all remaining bars
         stack = []
         max_area = 0
-        for height, index in heights:
+        for height, index in h_with_idx:
             start = index
             while stack and stack[-1][0] > height:
                 h, i = stack.pop()
