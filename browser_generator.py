@@ -193,7 +193,7 @@ def generate_from_url():
     driver.get(url)
     print("Waiting for page to load...")
     time.sleep(8)  # Initial wait for page load
-    
+
     # Wait for description element to be present
     try:
         wait = WebDriverWait(driver, 10)
@@ -247,14 +247,14 @@ def generate_from_url():
                 "span.text-medium",
                 "span.text-hard"
             ]
-            
+
             for selector in difficulty_selectors:
                 try:
                     element = driver.find_element(By.CSS_SELECTOR, selector)
                     # Check both text content and diff attribute
                     text = element.text.lower().strip()
                     diff_attr = element.get_attribute('diff')
-                    
+
                     if diff_attr and diff_attr.lower() in ['easy', 'medium', 'hard']:
                         difficulty = diff_attr.lower()
                         print(f"Found difficulty from attribute: {difficulty}")
@@ -265,7 +265,7 @@ def generate_from_url():
                         break
                 except:
                     continue
-            
+
             # If still not found, search for all divs and spans near the title
             if difficulty == "medium":  # Still default, not detected yet
                 try:
@@ -287,7 +287,7 @@ def generate_from_url():
                             break
                 except:
                     pass
-            
+
             print(f"Final detected difficulty: {difficulty}")
         except Exception as e:
             print(f"Difficulty detection error: {e}, using default: medium")
@@ -302,14 +302,14 @@ def generate_from_url():
             ("css selector", ".xFUwe"),
             ("css selector", "div._1l1MA")
         ]
-        
+
         for method, selector in description_selectors:
             try:
                 element = driver.find_element(By.CSS_SELECTOR, selector)
                 # Scroll to element to ensure it's loaded
                 driver.execute_script("arguments[0].scrollIntoView(true);", element)
                 time.sleep(1)
-                
+
                 # Get innerHTML to preserve formatting
                 description_html = element.get_attribute('innerHTML')
                 if description_html and len(description_html) > 50:
@@ -320,7 +320,7 @@ def generate_from_url():
             except Exception as e:
                 print(f"Selector {selector} failed: {str(e)[:100]}")
                 continue
-        
+
         # If description not found, try screenshot + OCR
         if (not description or len(description) < 50) and OCR_AVAILABLE:
             try:
@@ -328,14 +328,14 @@ def generate_from_url():
                 # Scroll to top first
                 driver.execute_script("window.scrollTo(0, 0);")
                 time.sleep(1)
-                
+
                 # Take screenshot of the page
                 screenshot = driver.get_screenshot_as_png()
                 image = Image.open(io.BytesIO(screenshot))
-                
+
                 # Extract text using OCR
                 extracted_text = pytesseract.image_to_string(image)
-                
+
                 if extracted_text and len(extracted_text) > 100:
                     description = extracted_text
                     print(f"Extracted description from screenshot using OCR ({len(description)} chars)")
@@ -344,7 +344,7 @@ def generate_from_url():
             except Exception as ocr_error:
                 print(f"Screenshot OCR failed: {ocr_error}")
                 print("Note: Make sure Tesseract OCR is installed. Download from: https://github.com/tesseract-ocr/tesseract")
-        
+
         # Last resort: try to get all text from body
         if not description or len(description) < 50:
             try:
@@ -362,37 +362,83 @@ def generate_from_url():
             except Exception as e:
                 print(f"Body text extraction failed: {e}")
 
+        # Select Python3 language tab
+        try:
+            # Try multiple selectors for Python3 tab
+            python_selectors = [
+                "div[title='Python3']",
+                "button[title='Python3']",
+                "[data-cy='lang-select-Python3']",
+                "//div[contains(text(), 'Python3')]",
+                "//button[contains(text(), 'Python3')]",
+            ]
+            for sel in python_selectors:
+                try:
+                    if sel.startswith("//"):
+                        elem = driver.find_element(By.XPATH, sel)
+                    else:
+                        elem = driver.find_element(By.CSS_SELECTOR, sel)
+                    elem.click()
+                    time.sleep(2)  # Wait for tab switch
+                    print("Selected Python3 tab")
+                    break
+                except Exception as e:
+                    print(f"Failed to select Python with {sel}: {e}")
+                    continue
+            else:
+                print("Could not find Python3 tab, proceeding with current language")
+        except Exception as e:
+            print(f"Error selecting Python tab: {e}")
+
         # Get initial Python code from the code editor
         try:
-            code_selectors = [
-                "div.monaco-editor",
-                "pre",
-                "code[class*='language-python']",
-                ".CodeMirror-code"
-            ]
-            
-            for selector in code_selectors:
+            # First, try to get code from Monaco editor using JavaScript
+            initial_code = driver.execute_script(
+                "return monaco.editor.getEditors()[0].getValue()"
+            )
+            if initial_code and len(initial_code) > 10:
+                print("Got initial code from Monaco editor")
+            else:
+                print(
+                    "Monaco editor returned empty or short code, trying fallback methods"
+                )
+                initial_code = ""
+
+            # Fallback: try textarea
+            if not initial_code:
                 try:
-                    code_element = driver.find_element(By.CSS_SELECTOR, selector)
-                    initial_code = code_element.text
-                    if initial_code and 'def ' in initial_code:
-                        print(f"Found initial code using selector: {selector}")
-                        break
-                except:
-                    continue
-                    
-            # If Monaco editor, try to get code from textarea
-            if not initial_code or 'def ' not in initial_code:
-                try:
-                    textarea = driver.find_element(By.CSS_SELECTOR, "textarea[class*='monaco']")
+                    textarea = driver.find_element(
+                        By.CSS_SELECTOR, "textarea[class*='monaco']"
+                    )
                     initial_code = textarea.get_attribute("value")
-                    print("Found code from textarea")
-                except:
-                    pass
-                    
+                    if initial_code and len(initial_code) > 10:
+                        print("Found code from textarea")
+                except Exception as e:
+                    print(f"Textarea fallback failed: {e}")
+
+            # Last fallback: try other selectors
+            if not initial_code:
+                code_selectors = [
+                    "div.monaco-editor",
+                    "pre",
+                    "code[class*='language-python']",
+                    ".CodeMirror-code",
+                ]
+
+                for selector in code_selectors:
+                    try:
+                        code_element = driver.find_element(By.CSS_SELECTOR, selector)
+                        initial_code = code_element.text
+                        if initial_code and "def " in initial_code:
+                            print(f"Found initial code using selector: {selector}")
+                            break
+                    except:
+                        continue
+
         except Exception as e:
             print(f"Could not extract initial code: {e}")
-                
+            initial_code = ""
+
     except Exception as e:
         print(f"Scraping error: {e}")
 
@@ -412,7 +458,7 @@ def generate_from_url():
         else:
             messagebox.showerror("Error", "Could not scrape problem description. Please ensure the page is fully loaded and try again.")
             return
-    
+
     if not prefix:
         # Try to extract from URL as fallback
         url_match = re.search(r'/problems/(\d+)', url)
@@ -432,7 +478,7 @@ def generate_from_url():
 
     # Check if user selected an existing folder or wants to create new one
     selected_folder = folder_combo.get()
-    
+
     if selected_folder == "+ Create New Folder" or not selected_folder:
         # Get custom folder name
         custom_folder = custom_folder_entry.get().strip()
@@ -464,13 +510,13 @@ def generate_from_url():
                 f.write("# Write your solution here\n\nclass Solution:\n    def solution(self):\n        pass\n")
 
         messagebox.showinfo("Success", f"Folder created successfully!\nPath: {folder_path}\nDifficulty: {difficulty}\nProblem: {prefix}. {problem_name.replace('_', ' ').title()}")
-        
+
         # Close browser after successful generation
         if driver:
             print("Closing browser...")
             driver.quit()
             driver = None
-            
+
     except Exception as e:
         messagebox.showerror("Error", f"Failed to create folder: {str(e)}")
 
