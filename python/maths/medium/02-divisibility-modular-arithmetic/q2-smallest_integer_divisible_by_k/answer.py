@@ -3,10 +3,10 @@ class Solution:
         if k % 2 == 0 or k % 5 == 0:
             return -1
         
-        n = 1
+        remainder = 1
         length = 1
-        while n % k != 0:
-            n = (n * 10 + 1) % k
+        while remainder != 0:
+            remainder = (remainder * 10 + 1) % k
             length += 1
         return length
 
