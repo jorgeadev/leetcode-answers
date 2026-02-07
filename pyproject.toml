@@ -4,4 +4,8 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "pillow>=12.1.0",
+    "pytesseract>=0.3.13",
+    "selenium>=4.40.0",
+]
