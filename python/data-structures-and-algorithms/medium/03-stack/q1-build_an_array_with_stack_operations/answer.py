@@ -49,5 +49,5 @@ if __name__ == "__main__":
     target5 = [2, 4, 6]
     n5 = 6
     print(f"Input: target = {target5}, n = {n5}")
-    print(f"Output: {solution.buildArray(target5, n5)}")  
+    print(f"Output: {solution.buildArray(target5, n5)}")
     # Expected: ['Push', 'Pop', 'Push', 'Push', 'Pop', 'Push', 'Push', 'Pop', 'Push']

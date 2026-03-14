@@ -5,12 +5,12 @@ class Solution:
         result = [0] * n
         stack = []
         prev_time = 0
-        
+
         for log in logs:
             func_id, action, timestamp = log.split(':')
             func_id = int(func_id)
             timestamp = int(timestamp)
-            
+
             if action == "start":
                 if stack:
                     result[stack[-1]] += timestamp - prev_time
@@ -19,9 +19,9 @@ class Solution:
             else:  # end
                 result[stack.pop()] += timestamp - prev_time + 1
                 prev_time = timestamp + 1
-        
+
         return result
-    
+
 
 # Test cases
 if __name__ == "__main__":

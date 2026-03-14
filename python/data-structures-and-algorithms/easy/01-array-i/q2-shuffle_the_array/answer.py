@@ -7,7 +7,7 @@ class Solution:
             res.append(nums[i])
             res.append(nums[n + i])
         return res
-    
+
 
 # Test cases
 if __name__ == "__main__":
