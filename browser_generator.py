@@ -31,7 +31,7 @@ class HTMLToMarkdown(HTMLParser):
         self.in_pre = False
         self.in_code = False
         self.in_strong = False
-        
+
     def handle_starttag(self, tag, attrs):
         if tag == 'p':
             self.markdown.append('\n')
@@ -69,7 +69,7 @@ class HTMLToMarkdown(HTMLParser):
                     src = 'https://leetcode.com' + src
                 # Add markdown image with full URL
                 self.markdown.append(f'\n![{alt}]({src})\n')
-            
+
     def handle_endtag(self, tag):
         if tag == 'p':
             self.markdown.append('\n')
@@ -86,10 +86,10 @@ class HTMLToMarkdown(HTMLParser):
             self.markdown.append('*')
         elif tag == 'ul':
             self.markdown.append('\n')
-            
+
     def handle_data(self, data):
         self.markdown.append(data)
-        
+
     def get_markdown(self):
         text = ''.join(self.markdown)
         # Clean up multiple newlines
@@ -113,7 +113,7 @@ def get_existing_folders():
     """Get list of existing folders in python directory."""
     python_dir = "python"
     folders = ["+ Create New Folder"]
-    
+
     if os.path.exists(python_dir):
         try:
             # Get only root level subdirectories in python folder
@@ -123,7 +123,7 @@ def get_existing_folders():
                     folders.append(folder)
         except Exception as e:
             print(f"Error reading folders: {e}")
-    
+
     return folders
 
 def on_folder_selection_change(event):
@@ -199,7 +199,7 @@ def generate_from_url():
         wait = WebDriverWait(driver, 10)
         wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".elfjS, [data-track-load='description_content'], .content__u3I1")))
         print("Description element detected")
-    except:
+    except Exception:
         print("Timeout waiting for description element, continuing anyway...")
 
     difficulty = "medium"  # default
@@ -225,7 +225,7 @@ def generate_from_url():
                             prefix = prefix_match.group(1)
                             print(f"Extracted prefix: {prefix}")
                         break
-                except:
+                except Exception:
                     continue
         except Exception as e:
             print(f"Could not find problem title: {e}")
@@ -238,7 +238,7 @@ def generate_from_url():
                 "div[diff='Medium']",
                 "div[diff='Hard']",
                 "div[class*='text-difficulty-easy']",
-                "div[class*='text-difficulty-medium']", 
+                "div[class*='text-difficulty-medium']",
                 "div[class*='text-difficulty-hard']",
                 "div.text-easy",
                 "div.text-medium",
@@ -263,7 +263,7 @@ def generate_from_url():
                         difficulty = text
                         print(f"Found difficulty from text: {difficulty}")
                         break
-                except:
+                except Exception:
                     continue
 
             # If still not found, search for all divs and spans near the title
@@ -275,17 +275,17 @@ def generate_from_url():
                         text = elem.text.strip().lower()
                         if text == 'easy':
                             difficulty = 'easy'
-                            print(f"Found difficulty via text search: easy")
+                            print("Found difficulty via text search: easy")
                             break
                         elif text == 'medium':
                             difficulty = 'medium'
-                            print(f"Found difficulty via text search: medium")
+                            print("Found difficulty via text search: medium")
                             break
                         elif text == 'hard':
                             difficulty = 'hard'
-                            print(f"Found difficulty via text search: hard")
+                            print("Found difficulty via text search: hard")
                             break
-                except:
+                except Exception:
                     pass
 
             print(f"Final detected difficulty: {difficulty}")
@@ -432,7 +432,7 @@ def generate_from_url():
                         if initial_code and "def " in initial_code:
                             print(f"Found initial code using selector: {selector}")
                             break
-                    except:
+                    except Exception:
                         continue
 
         except Exception as e:
@@ -446,11 +446,11 @@ def generate_from_url():
     if not description or len(description) < 50:
         print(f"Description validation failed. Length: {len(description) if description else 0}")
         # Offer manual input as final fallback
-        user_input = messagebox.askyesno("Description Not Found", 
+        user_input = messagebox.askyesno("Description Not Found",
             "Could not automatically scrape the problem description.\n\nWould you like to manually paste the description?")
         if user_input:
-            description = simpledialog.askstring("Problem Description", 
-                "Paste the problem description:", 
+            description = simpledialog.askstring("Problem Description",
+                "Paste the problem description:",
                 parent=root)
             if not description or len(description) < 10:
                 messagebox.showerror("Error", "No valid description provided.")
