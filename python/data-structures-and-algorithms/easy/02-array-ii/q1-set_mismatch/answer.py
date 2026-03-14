@@ -9,19 +9,19 @@ class Solution:
         n = len(nums)
         x = int((n*(n+1))/2)
         return [duplicates[0], (duplicates[0] + (x - total))]
-    
+
         # dup, missing = -1, -1
-        
+
         # for i in range(1, len(nums) + 1):
         #     count = nums.count(i)
         #     if count == 2:
         #         dup = i
         #     elif count == 0:
         #         missing = i
-        
+
         # return [dup, missing]
 
-    
+
 
 # Test cases
 if __name__ == "__main__":

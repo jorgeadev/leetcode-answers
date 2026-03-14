@@ -9,7 +9,7 @@ class Solution:
             reversed_num = reversed_num * 10 + digit
             x //= 10
         return original == reversed_num
-    
+
 # Test cases
 if __name__ == "__main__":
     solution = Solution()

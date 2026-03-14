@@ -13,7 +13,7 @@ class Solution:
                 h, i = stack.pop()
                 max_area = max(max_area, h * (index - i))
                 start = i
-            stack.append((height, start))   
+            stack.append((height, start))
         return max_area
 
 

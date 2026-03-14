@@ -6,7 +6,7 @@ class Solution:
             if left_sum == right_sum:
                 return i
         return -1
-    
+
 # Test cases
 if __name__ == "__main__":
     solution = Solution()

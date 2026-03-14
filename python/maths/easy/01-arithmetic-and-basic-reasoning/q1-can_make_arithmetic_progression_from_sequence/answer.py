@@ -4,7 +4,7 @@ from typing import List
 class Solution:
     def canMakeArithmeticProgression(self, arr: List[int]) -> bool:
         sorted_arr = sorted(arr)
-        
+
         for i in range(2, len(sorted_arr)):
             if sorted_arr[i] - sorted_arr[i - 1] != sorted_arr[1] - sorted_arr[0]:
                 return False
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     arr1 = [3, 5, 1]
     print(f"Input: {arr1}")
     print("Can make arithmetic progression:", solution.canMakeArithmeticProgression(arr1))  # Expected: True
-    
+
     # Example 2
     arr2 = [1, 2, 4]
     print(f"Input: {arr2}")

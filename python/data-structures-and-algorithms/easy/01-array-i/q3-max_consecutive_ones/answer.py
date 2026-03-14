@@ -12,7 +12,7 @@ class Solution:
                 res += 1
                 count = max(count, res)
         return count
-    
+
 
 # Test cases
 if __name__ == "__main__":

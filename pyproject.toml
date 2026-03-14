@@ -9,3 +9,11 @@ dependencies = [
     "pytesseract>=0.3.13",
     "selenium>=4.40.0",
 ]
+
+[tool.ruff]
+target-version = "py314"
+exclude = ["python/problems"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F"]
+ignore = ["E501"]

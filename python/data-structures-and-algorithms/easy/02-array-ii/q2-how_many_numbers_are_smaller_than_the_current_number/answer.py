@@ -11,7 +11,7 @@ class Solution:
                     count += 1
             result.append(count)
         return result
-    
+
 
 # Test cases
 if __name__ == "__main__":
