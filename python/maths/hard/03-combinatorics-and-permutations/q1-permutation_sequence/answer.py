@@ -1,6 +1,3 @@
-import math
-
-
 class Solution:
 	def getPermutation(self, n: int, k: int) -> str:
 		# https://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
